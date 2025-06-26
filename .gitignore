@@ -1,2 +1,3 @@
 src/__pycache__/
 tests/__pycache__/
+frozen_east_text_detection.pb
