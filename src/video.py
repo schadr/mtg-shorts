@@ -46,3 +46,8 @@ def extract_card_info_from_video(video):
         card_number, mtg_set = extract_card_info_from_image("tmp.jpg")
         cards_in_frame.append((card_number, mtg_set))
     return cards_in_frame
+
+def add_card_info_to_frame(frame, text, price):
+    cv2.putText(frame, f"{text}", (10, 40),  cv2.FONT_HERSHEY_TRIPLEX, 1, (255, 0, 0), 2)
+    cv2.putText(frame, f"{price}", (330, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
+    return frame
