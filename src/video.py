@@ -1,8 +1,8 @@
-import cv2 as cv
+import cv2
 from google import genai
 
 def load_video(file_uri):
-    vid = cv.VideoCapture(file_uri)
+    vid = cv2.VideoCapture(file_uri)
     if vid.isOpened():
         return vid
     vid.release()
@@ -29,8 +29,20 @@ def extract_card_info_from_image(filename):
         ],
     )
     print(response.text)
-    if response.text == "No card found":
+    if response.text.replace(".","") == "No card found": # Gemini sometimes adds the .
         return None, None
     card_number = int(response.text.split('\n')[0])
     mtg_set = response.text.split('\n')[1]
     return card_number, mtg_set
+
+def extract_card_info_from_video(video):
+    cards_in_frame = []
+    while video.isOpened():
+        ret, frame = video.read()
+        if not ret:
+            print("Last frame reached")
+            break
+        cv2.imwrite("tmp.jpg", frame)
+        card_number, mtg_set = extract_card_info_from_image("tmp.jpg")
+        cards_in_frame.append((card_number, mtg_set))
+    return cards_in_frame
