@@ -1,7 +1,5 @@
 import cv2 as cv
-import urllib.request
-import tarfile
-import io
+from google import genai
 
 def load_video(file_uri):
     vid = cv.VideoCapture(file_uri)
@@ -10,30 +8,29 @@ def load_video(file_uri):
     vid.release()
     return None
 
-def extract_card_info(video):
-    i = 0
-    while video.isOpened():
-        ret, frame = video.read()
-        if not ret:
-            print("Last frame reached")
-            break
-        print(f"Read frame {i}")
-        i += 1
+prompt = "Extract the collector number and the information that is below the collector number but before the EN/JP from the card, which is an exactly the three character long string." \
+       + "Remove any character from the collector number." \
+       + "Please show the collector number on the first line response and the other on the second line and nothing else." \
+       + "If there is no readable card please return 'No card found'."
 
-east_uri = 'https://www.dropbox.com/s/r2ingd0l3zt8hxs/frozen_east_text_detection.tar.gz?dl=1'
+def get_ai_client():    
+    client = genai.Client()
+    return client
 
-def load_text_detection(inputSize):
-    with urllib.request.urlopen(east_uri) as response:
-            with tarfile.open(fileobj=response, mode="r:gz") as tar:
-                tar.extractall(path=".")
-    
-    # values might need tuning
-    conf_thresh = 0.8
-    nms_thresh = 0.4
-    mean = (122.67891434, 116.66876762, 104.00698793)
-    
-    textDetectorEAST = cv.dnn_TextDetectionModel_EAST('./frozen_east_text_detection.pb')
-    textDetectorEAST.setConfidenceThreshold(conf_thresh)
-    textDetectorEAST.setNMSThreshold(nms_thresh)
-    textDetectorEAST.setInputParams(1.0, inputSize, mean, True)
-    return textDetectorEAST
+def extract_card_info_from_image(filename):
+    client = get_ai_client()
+    myfile = client.files.upload(file=filename)
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[
+            myfile,
+            "\n\n",
+            prompt
+        ],
+    )
+    print(response.text)
+    if response.text == "No card found":
+        return None, None
+    card_number = int(response.text.split('\n')[0])
+    mtg_set = response.text.split('\n')[1]
+    return card_number, mtg_set
