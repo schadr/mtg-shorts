@@ -2,6 +2,7 @@ from src.video import load_video
 from src.video import extract_card_info_from_image
 from src.video import extract_card_info_from_video
 from src.video import add_card_info_to_frame
+from src.video import add_card_info_to_video
 
 
 import cv2
@@ -30,3 +31,12 @@ def test_full_video():
 def test_add_card_info_to_frame():
     image = cv2.imread('files/test-picture-of-card.png')
     add_card_info_to_frame(image, "Cornered by Black Mages", "$"+str(1.12))
+
+def test_add_card_info_to_video():
+    video = load_video('files/test-video-720p.mov')
+    info = []
+    for i in range(691): # the video has 691 frames
+        info.append((f"Frame {i}",f"${i}"))
+    mod_video = add_card_info_to_video(video, info)
+    mod_video.release()
+    assert mod_video != None

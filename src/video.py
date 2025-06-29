@@ -48,6 +48,25 @@ def extract_card_info_from_video(video):
     return cards_in_frame
 
 def add_card_info_to_frame(frame, text, price):
-    cv2.putText(frame, f"{text}", (10, 40),  cv2.FONT_HERSHEY_TRIPLEX, 1, (255, 0, 0), 2)
-    cv2.putText(frame, f"{price}", (330, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
+    cv2.putText(frame, f"{text}", (10, 80),  cv2.FONT_HERSHEY_TRIPLEX, 1, (255, 0, 0), 2)
+    cv2.putText(frame, f"{price}", (530, 160), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
     return frame
+
+def add_card_info_to_video(video, cards_in_frame):
+    frame_number = 0
+    width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps = video.get(cv2.CAP_PROP_FPS)
+
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
+    out = cv2.VideoWriter('tmp.mp4', fourcc, fps, (width, height))
+
+    while video.isOpened():
+        ret, frame = video.read()
+        if not ret:
+            print("Last frame reached")
+            break
+        mod_frame = add_card_info_to_frame(frame, cards_in_frame[frame_number][0], cards_in_frame[frame_number][1])
+        out.write(mod_frame) 
+        frame_number += 1
+    return out
