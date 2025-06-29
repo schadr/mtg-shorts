@@ -78,7 +78,7 @@ def build_frames():
     for i in range(642, 655):
         frames.append(())
     plans = ("FIN", 294) # 655 - 690
-    for i in range(655, 690):
+    for i in range(655, 691):
         frames.append(plans)
     return frames
 

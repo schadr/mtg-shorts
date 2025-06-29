@@ -57,13 +57,26 @@ def load_card_cache(mtg_set):
             card_cache[mtg_set][int(number)] = Card(uuid, name, int(number), mtg_set)
         #pass
     
-    
-
-
-
 def get_price(mtg_set, card_number, type = Type.NORMAL):
     load_card_cache(mtg_set)
     print(card_cache[mtg_set][card_number])
     if type == Type.NORMAL:
         return card_cache[mtg_set][card_number].price
     return card_cache[mtg_set][card_number].price_foil
+
+def get_card(mtg_set, card_number):
+    load_card_cache(mtg_set)
+    if card_number in card_cache[mtg_set]:
+        return card_cache[mtg_set][card_number]
+    return None
+
+def convert_to_cards(set_card_numbers):
+    cards = []
+    for frame in set_card_numbers:
+        if frame == ():
+            cards.append(None)
+        else:
+            mtg_set = frame[0]
+            card_number = frame[1]
+            cards.append(get_card(mtg_set, card_number))
+    return cards

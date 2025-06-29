@@ -66,7 +66,9 @@ def add_card_info_to_video(video, cards_in_frame):
         if not ret:
             print("Last frame reached")
             break
-        mod_frame = add_card_info_to_frame(frame, cards_in_frame[frame_number][0], cards_in_frame[frame_number][1])
+        mod_frame = frame
+        if cards_in_frame[frame_number] != None:
+            mod_frame = add_card_info_to_frame(frame, cards_in_frame[frame_number].name, f"${cards_in_frame[frame_number].price}")
         out.write(mod_frame) 
         frame_number += 1
     return out
