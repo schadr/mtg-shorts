@@ -10,4 +10,3 @@ def test_e2e_no_ocr():
     video = load_video('files/test-video-720p.mov')
     mod_video = add_card_info_to_video(video, cards_per_frame)
     mod_video.release()
-
