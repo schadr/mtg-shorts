@@ -1,6 +1,7 @@
 #!/bin/python3
 
 import os
+import shutil
 import cv2
 import argparse
 
@@ -21,6 +22,8 @@ def create_fps_video(file_path):
     filename = os.path.basename(file_path)
     path = os.path.dirname(file_path)
     add_card_info_to_video(video, cards_in_frame, f"{path}/frame-{filename}", 1)
+    shutil.copyfile("templates/template-play-booster.json", f"{path}/cards-{filename.replace(".","-")}.json")
+
 
 def main():
     parser = argparse.ArgumentParser(description="MTG Shorts CLI")
