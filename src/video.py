@@ -5,6 +5,7 @@ def load_video(file_uri):
     vid = cv2.VideoCapture(file_uri)
     if vid.isOpened():
         return vid
+    print("Error: Could not open video file.")
     vid.release()
     return None
 
@@ -52,14 +53,15 @@ def add_card_info_to_frame(frame, text, price):
     cv2.putText(frame, f"{price}", (530, 160), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
     return frame
 
-def add_card_info_to_video(video, cards_in_frame):
+def add_card_info_to_video(video, cards_in_frame, output_file='tmp.mp4', fps=None):
     frame_number = 0
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = video.get(cv2.CAP_PROP_FPS)
+    if fps is None:
+        fps = video.get(cv2.CAP_PROP_FPS)
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
-    out = cv2.VideoWriter('tmp.mp4', fourcc, fps, (width, height))
+    out = cv2.VideoWriter(output_file, fourcc, fps, (width, height))
 
     while video.isOpened():
         ret, frame = video.read()
