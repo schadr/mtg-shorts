@@ -1,0 +1,94 @@
+{
+    "cards" : [
+        {
+            "card_number": 0,
+            "mtg_set": "token",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 1,
+            "mtg_set": "c1",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 2,
+            "mtg_set": "c2",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 3,
+            "mtg_set": "c3",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 4,
+            "mtg_set": "c4",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 5,
+            "mtg_set": "c5",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 6,
+            "mtg_set": "c6",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 7,
+            "mtg_set": "c7",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 8,
+            "mtg_set": "u1",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 9,
+            "mtg_set": "u2",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 10,
+            "mtg_set": "u3",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 11,
+            "mtg_set": "u4",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 12,
+            "mtg_set": "rm1",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 13,
+            "mtg_set": "f1",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "card_number": 14,
+            "mtg_set": "l1",
+            "first_frame": 0,
+            "last_frame": 0
+        }
+    ]
+}
