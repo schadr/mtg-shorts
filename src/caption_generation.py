@@ -1,3 +1,6 @@
+import json
+
+
 def smooth_captions(frame_captions):
     smoothed_captions = []
     skipped_frames = 0
@@ -18,5 +21,23 @@ def smooth_captions(frame_captions):
         if last_caption is None:
             smoothed_captions.append(frame_captions[i])
     for j in range(skipped_frames):
+        smoothed_captions.append(())
+    return smoothed_captions
+
+def load_captions_from_file(file_path):
+    data = None
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    smoothed_captions = []
+    current_index = 0
+    for card in data["cards"]:
+        start = card["first_frame"]
+        end = card["last_frame"]
+        for i in range(current_index, start):
+            smoothed_captions.append(())
+        for i in range(start, end + 1):
+            smoothed_captions.append((card["mtg_set"], card["card_number"]))
+        current_index = end + 1
+    for i in range(current_index, int(data["total_frames"])):
         smoothed_captions.append(())
     return smoothed_captions

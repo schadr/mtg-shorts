@@ -1,21 +1,29 @@
 #!/bin/python3
 
+import json
 import os
 import shutil
 import cv2
 import argparse
 
-from src.caption_generation import smooth_captions
-from src.pricing import Card
+from src.caption_generation import load_captions_from_file, smooth_captions
+from src.pricing import Card, convert_to_cards
 from src.video import add_card_info_to_video, extract_card_info_from_video, load_video
 
-def process_video(file_path, collector=False):
+def process_video(file_path, collector=False, use_config=False):
     video = load_video(file_path)
-    cards_in_frame = extract_card_info_from_video(video)
-    smoothed_captions = smooth_captions(cards_in_frame)
-    add_card_info_to_video(video, smoothed_captions)
+    smooth_captions = []
+    if not use_config:
+        cards_in_frame = extract_card_info_from_video(video)
+        smoothed_captions = smooth_captions(cards_in_frame)
+    else:
+        filename = os.path.basename(file_path)
+        path = os.path.dirname(file_path)
+        data = None
+        smoothed_captions = load_captions_from_file(f"{path}/cards-{filename.replace(".","-")}.json")
+    add_card_info_to_video(video, convert_to_cards(smoothed_captions))
 
-def create_fps_video(file_path, collector=False):
+def create_fps_video(file_path, collector=False, use_config=False):
     video = load_video(file_path)
     num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
     cards_in_frame = [Card("uuid", f"Frame: {i}", i, "set", i, i) for i in range(num_frames)]
@@ -34,8 +42,9 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--file', type=str, help='Path to the video file that needs to be edited')
     group.add_argument('--folder', type=str, help='Folder containing video files to be processed')
-    group.add_argument('--fps', type=bool, help='Outputs videos with with framenumber captions at 1 fps')
-    group.add_argument('--collector', type=bool, help='Video(s) are of collector packs')
+    group.add_argument('--fps', type=bool, default=False, help='Outputs videos with with framenumber captions at 1 fps')
+    group.add_argument('--collector', type=bool, default=False, help='Video(s) are of collector packs')
+    group.add_argument('--use-config', type=bool, default=False, help='Use config file for video processing')
     args = parser.parse_args()
 
     processor = None
@@ -45,13 +54,13 @@ def main():
         processor = process_video
 
     if args.file:
-        processor(args.file, args.collector)
+        processor(args.file, args.collector, args.use_config)
         
     if args.folder:
         for item in os.listdir(args.folder):
             file_name = os.path.join(args.folder, item)
             if os.path.isfile(file_name):
-                processor(os.path.join(args.folder, file_name), args.collector)
+                processor(os.path.join(args.folder, file_name), args.collector, args.use_config)
 
 if __name__ == "__main__":
     main()
