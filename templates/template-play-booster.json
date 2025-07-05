@@ -82,7 +82,8 @@
             "card_number": 13,
             "mtg_set": "f1",
             "first_frame": 0,
-            "last_frame": 0
+            "last_frame": 0,
+            "foil": true
         },
         {
             "card_number": 14,

@@ -34,7 +34,8 @@ def extract_card_info_from_image(filename):
         return None, None
     card_number = int(response.text.split('\n')[0])
     mtg_set = response.text.split('\n')[1]
-    return card_number, mtg_set
+    foil = False
+    return card_number, mtg_set, foil
 
 def extract_card_info_from_video(video):
     cards_in_frame = []
@@ -44,8 +45,8 @@ def extract_card_info_from_video(video):
             print("Last frame reached")
             break
         cv2.imwrite("tmp.jpg", frame)
-        card_number, mtg_set = extract_card_info_from_image("tmp.jpg")
-        cards_in_frame.append((card_number, mtg_set))
+        card_number, mtg_set, foil = extract_card_info_from_image("tmp.jpg")
+        cards_in_frame.append((card_number, mtg_set, foil))
     return cards_in_frame
 
 def add_card_info_to_frame(frame, text, price):

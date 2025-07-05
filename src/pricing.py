@@ -14,13 +14,14 @@ class Type(Enum):
     FOIL = "foil"
 
 class Card:
-    def __init__(self, uuid, name, number, mtg_set, price = -1, price_foil = -1):
+    def __init__(self, uuid, name, number, mtg_set, price = -1, price_foil = -1, foil = False):
         self.uuid = uuid
         self.name = name
         self.number = number
         self.mtg_set = mtg_set
         self.price = price
         self.price_foil = price_foil
+        self.foil = foil
         if uuid in price_cache:
             self.price = price_cache[uuid]['normal']
             self.price_foil = price_cache[uuid]['foil']
@@ -78,5 +79,7 @@ def convert_to_cards(set_card_numbers):
         else:
             mtg_set = frame[0]
             card_number = frame[1]
-            cards.append(get_card(mtg_set, card_number))
+            card = get_card(mtg_set, card_number)
+            card.foil = frame[2]
+            cards.append(card)
     return cards
