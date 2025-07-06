@@ -49,12 +49,13 @@ def extract_card_info_from_video(video):
         cards_in_frame.append((card_number, mtg_set, foil))
     return cards_in_frame
 
-def add_card_info_to_frame(frame, text, price):
+def add_card_info_to_frame(frame, text, price, total, cost):
     cv2.putText(frame, f"{text}", (10, 80),  cv2.FONT_HERSHEY_TRIPLEX, 1, (255, 0, 0), 2)
     cv2.putText(frame, f"{price}", (530, 160), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
+    cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (400, 260), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
     return frame
 
-def add_card_info_to_video(video, cards_in_frame, output_file='tmp.mp4', fps=None):
+def add_card_info_to_video(video, cards_in_frame, total_in_frame, cost, output_file='tmp.mp4', fps=None):
     frame_number = 0
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -71,7 +72,9 @@ def add_card_info_to_video(video, cards_in_frame, output_file='tmp.mp4', fps=Non
             break
         mod_frame = frame
         if cards_in_frame[frame_number] != None:
-            mod_frame = add_card_info_to_frame(frame, cards_in_frame[frame_number].name, f"${cards_in_frame[frame_number].price}")
+            mod_frame = add_card_info_to_frame(frame, cards_in_frame[frame_number].name, f"${cards_in_frame[frame_number].price}", total_in_frame[frame_number], cost)
+        else:
+            mod_frame = add_card_info_to_frame(frame, "", "", total_in_frame[frame_number], cost)
         out.write(mod_frame) 
         frame_number += 1
     return out

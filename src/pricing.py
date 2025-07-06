@@ -83,3 +83,18 @@ def convert_to_cards(set_card_numbers):
             card.foil = frame[2]
             cards.append(card)
     return cards
+
+def create_totals(cards, cost):
+    last_card = None
+    total = 0.0
+    totals = []
+    for card in cards:
+        if last_card is None and card is not None:
+            total += card.price_foil if card.foil else card.price
+            totals.append(total)
+        totals.append(total)
+        last_card = card
+    # shifting the array to the left to better line up with the card announcements
+    totals.append(total)
+    totals.pop(0)
+    return totals
