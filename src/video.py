@@ -1,3 +1,4 @@
+import math
 import cv2
 from google import genai
 
@@ -50,9 +51,21 @@ def extract_card_info_from_video(video):
     return cards_in_frame
 
 def add_card_info_to_frame(frame, text, price, total, cost):
-    cv2.putText(frame, f"{text}", (10, 80),  cv2.FONT_HERSHEY_TRIPLEX, 1, (255, 0, 0), 2)
-    cv2.putText(frame, f"{price}", (530, 160), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
-    cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (400, 260), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
+    height, width, _ = frame.shape
+    
+    # card title
+    textSize, _ = cv2.getTextSize(f"{text}", cv2.FONT_HERSHEY_TRIPLEX, 1, 2)
+    cv2.putText(frame, f"{text}", (10, 50),  cv2.FONT_HERSHEY_TRIPLEX, min(1.0, (width-20)/textSize[0]), (0, 0, 0), 10)
+    cv2.putText(frame, f"{text}", (10, 50),  cv2.FONT_HERSHEY_TRIPLEX, min(1.0, (width-20)/textSize[0]), (255, 255, 255), 2)
+    
+    # card value
+    textSize, _ = cv2.getTextSize(f"{price}", cv2.FONT_HERSHEY_SIMPLEX, 1.5, 2)
+    cv2.putText(frame, f"{price}", (width-40-textSize[0], 160), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 0), 8)
+    cv2.putText(frame, f"{price}", (width-40-textSize[0], 160), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (57, 255, 20), 2)
+    
+    # pack value
+    textSize, _ = cv2.getTextSize(f"${total:.2f}/${cost:.2f}", cv2.FONT_HERSHEY_SIMPLEX, 1.5, 2)
+    cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (width-10-textSize[0], height - textSize[1] - 60), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
     return frame
 
 def add_card_info_to_video(video, cards_in_frame, total_in_frame, cost, output_file='tmp.mp4', fps=None):
