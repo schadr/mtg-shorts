@@ -60,12 +60,33 @@ def add_card_info_to_frame(frame, text, price, total, cost):
     
     # card value
     textSize, _ = cv2.getTextSize(f"{price}", cv2.FONT_HERSHEY_SIMPLEX, 1.5, 2)
-    cv2.putText(frame, f"{price}", (width-40-textSize[0], 160), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 0), 8)
-    cv2.putText(frame, f"{price}", (width-40-textSize[0], 160), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (57, 255, 20), 2)
+    cv2.putText(frame, f"{price}", (width-40-textSize[0], 120), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 0), 8)
+    cv2.putText(frame, f"{price}", (width-40-textSize[0], 120), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (57, 255, 20), 2)
     
     # pack value
     textSize, _ = cv2.getTextSize(f"${total:.2f}/${cost:.2f}", cv2.FONT_HERSHEY_SIMPLEX, 1.5, 2)
-    cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (width-10-textSize[0], height - textSize[1] - 60), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
+    x = int((width - textSize[0])/2)
+    pack_value_color = (0,0,255) if (total/cost) < 1 else (0,255,0)
+    cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (x, height - textSize[1] - 30), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 0), 8)
+    cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (x, height - textSize[1] - 30), cv2.FONT_HERSHEY_SIMPLEX, 1.5, pack_value_color, 2)
+    
+    # right side box
+    bar_width = 40
+    bar_height = int(height / (3/2))
+    bar_x = width - 10
+    bar_y = height - bar_height
+    bar_fill = int(min(1.0,total / cost) * bar_height)
+
+    # background
+    cv2.rectangle(frame, (bar_x, bar_y), (bar_x + bar_width, bar_y + bar_height), (0,0,0), 8)
+    #excess
+    cv2.rectangle(frame, (bar_x, max(0, bar_y - (int(total / cost * bar_height) - bar_height)) ), (bar_x+bar_width, bar_y), (0,255,255), -1)
+    #empty
+    cv2.rectangle(frame, (bar_x, bar_y), (bar_x + bar_width, bar_y + (bar_height - bar_fill)), (0, 0, 255), -1)
+    #filled
+    cv2.rectangle(frame, (bar_x, bar_y + (bar_height - bar_fill)), (bar_x + bar_width, bar_y + bar_height), (0, 255, 0), -1)
+    cv2.line(frame, (bar_x - 10, bar_y + (bar_height - bar_fill)), (bar_x + bar_width, bar_y + (bar_height - bar_fill)), (0, 0, 0), 3)
+
     return frame
 
 def add_card_info_to_video(video, cards_in_frame, total_in_frame, cost, output_file='tmp.mp4', fps=None):
