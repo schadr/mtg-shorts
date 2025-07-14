@@ -1,7 +1,17 @@
 {
     "text" : [
         {
+            "text": "Let's open a pack. What do you think we pull today?",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
             "text": "Like and Subsribe",
+            "first_frame": 0,
+            "last_frame": 0
+        },
+        {
+            "text": "Did you like the pull? Let me know in the comments",
             "first_frame": 0,
             "last_frame": 0
         }
