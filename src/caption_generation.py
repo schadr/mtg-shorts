@@ -29,7 +29,15 @@ def load_captions_from_file(file_path):
     with open(file_path, 'r') as file:
         data = json.load(file)
     smoothed_captions = []
+    text_in_frame = {}
     current_index = 0
+    for text in data["text"]:
+        start = int(text["first_frame"])
+        end = int(text["last_frame"])
+        text_text = text["text"]
+        for i in range(start,end):
+            text_in_frame[i] = text_text
+
     for card in data["cards"]:
         start = card["first_frame"]
         end = card["last_frame"]
@@ -40,4 +48,4 @@ def load_captions_from_file(file_path):
         current_index = end + 1
     for i in range(current_index, int(data["total_frames"])):
         smoothed_captions.append(())
-    return smoothed_captions
+    return smoothed_captions, text_in_frame

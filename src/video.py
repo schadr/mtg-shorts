@@ -1,6 +1,6 @@
-import math
 import cv2
 from google import genai
+import textwrap 
 
 def load_video(file_uri):
     vid = cv2.VideoCapture(file_uri)
@@ -89,7 +89,31 @@ def add_card_info_to_frame(frame, text, price, total, cost):
 
     return frame
 
-def add_card_info_to_video(video, cards_in_frame, total_in_frame, cost, output_file='tmp.mp4', fps=None):
+def add_message_to_center(frame, message):
+    height, width, _ = frame.shape
+    textSize, _ = cv2.getTextSize(message, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+    
+    
+    wrapped_text = textwrap.wrap(message, int(len(message) / (textSize[0] / width)))
+    lines = len(wrapped_text)
+    
+    print(lines)
+
+    center_x = int(width/2)
+    center_y = int(height/2)
+
+    for line_counter, line in enumerate(wrapped_text):
+        textSize, _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+        off_set = int(lines / 2) - line_counter
+
+        x = center_x - int(textSize[0]/2)
+        y = center_y - int(textSize[1]/2) - off_set * (textSize[1] + 5)
+
+        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 6)
+        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+    return frame
+
+def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame, cost, output_file='tmp.mp4', fps=None):
     frame_number = 0
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -106,9 +130,11 @@ def add_card_info_to_video(video, cards_in_frame, total_in_frame, cost, output_f
             break
         mod_frame = frame
         if cards_in_frame[frame_number] != None:
-            mod_frame = add_card_info_to_frame(frame, cards_in_frame[frame_number].name, f"${cards_in_frame[frame_number].price}", total_in_frame[frame_number], cost)
+            mod_frame = add_card_info_to_frame(mod_frame, cards_in_frame[frame_number].name, f"${cards_in_frame[frame_number].price}", total_in_frame[frame_number], cost)
         else:
-            mod_frame = add_card_info_to_frame(frame, "", "", total_in_frame[frame_number], cost)
+            mod_frame = add_card_info_to_frame(mod_frame, "", "", total_in_frame[frame_number], cost)
+        if frame_number in text_in_frame:
+            mod_frame = add_message_to_center(mod_frame, text_in_frame[frame_number])
         out.write(mod_frame) 
         frame_number += 1
     return out
