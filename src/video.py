@@ -1,6 +1,8 @@
 import cv2
 from google import genai
-import textwrap 
+import textwrap
+
+from src.pricing import Rarity 
 
 def load_video(file_uri):
     vid = cv2.VideoCapture(file_uri)
@@ -94,7 +96,7 @@ def add_message_to_center(frame, message):
     textSize, _ = cv2.getTextSize(message, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
     
     
-    wrapped_text = textwrap.wrap(message, int(len(message) / (textSize[0] / width)))
+    wrapped_text = textwrap.wrap(message, max(1, int(len(message) / (max(1,textSize[0]) / width))))
     lines = len(wrapped_text)
     
     print(lines)
@@ -103,17 +105,24 @@ def add_message_to_center(frame, message):
     center_y = int(height/2)
 
     for line_counter, line in enumerate(wrapped_text):
-        textSize, _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+        textSize, _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 3, 2)
         off_set = int(lines / 2) - line_counter
 
         x = center_x - int(textSize[0]/2)
         y = center_y - int(textSize[1]/2) - off_set * (textSize[1] + 5)
 
-        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 6)
-        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 3, (0,0,0), 6)
+        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 3, (255,255,255), 2)
     return frame
 
-def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame, cost, output_file='tmp.mp4', fps=None):
+rare_shout_outs = {
+    0: "",
+    1: "",
+    2: "!!double rare!!",
+    3: "!!!tripple rare!!",
+}
+
+def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame, cost, output_file='tmp.mp4', fps=None, collector=False):
     frame_number = 0
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -123,12 +132,17 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
     fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
     out = cv2.VideoWriter(output_file, fourcc, fps, (width, height))
 
+    rare_set = set()
+
     while video.isOpened():
         ret, frame = video.read()
         if not ret:
             print("Last frame reached")
             break
         mod_frame = frame
+        if cards_in_frame[frame_number] != None and cards_in_frame[frame_number].rarity in [Rarity.RARE, Rarity.MYTHIC] and not collector:
+            rare_set.add(cards_in_frame[frame_number].name)
+            mod_frame = add_message_to_center(mod_frame, rare_shout_outs[len(rare_set)])
         if cards_in_frame[frame_number] != None:
             mod_frame = add_card_info_to_frame(mod_frame, cards_in_frame[frame_number].name, f"${cards_in_frame[frame_number].price}", total_in_frame[frame_number], cost)
         else:

@@ -68,7 +68,10 @@ def build_frames():
     for i in range(580, 587):
         frames.append(())
     tella = ("FIN", 244, False) # 587 - 613
-    for i in range(587, 613):
+    for i in range(587, 600):
+        frames.append(tella)
+    tella = ("FIN", 196, False)
+    for i in range(601, 613):
         frames.append(tella)
     for i in range(613, 628):
         frames.append(())

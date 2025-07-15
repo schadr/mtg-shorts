@@ -24,7 +24,7 @@ def process_video(file_path, collector=False, use_config=False, cost=0):
         smoothed_captions, text_in_frame = load_captions_from_file(f"{path}/cards-{filename.replace(".","-")}.json")
     cards = convert_to_cards(smoothed_captions)
     totals = create_totals(cards, cost)
-    add_card_info_to_video(video, text_in_frame, cards, totals, cost, f"{path}/captioned-{filename}")
+    add_card_info_to_video(video, text_in_frame, cards, totals, cost, f"{path}/captioned-{filename}", 24, collector)
 
 def create_fps_video(file_path, collector=False, use_config=False, cost=0):
     video = load_video(file_path)

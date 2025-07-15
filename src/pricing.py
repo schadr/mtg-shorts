@@ -13,8 +13,21 @@ class Type(Enum):
     NORMAL = "normal"
     FOIL = "foil"
 
+class Rarity(Enum):
+    COMMON = "common"
+    UNCOMMON = "uncommon"
+    RARE = "rare"
+    MYTHIC = "mythic"
+
+rarity_map = {
+    "common": Rarity.COMMON,
+    "uncommon": Rarity.UNCOMMON,
+    "rare": Rarity.RARE,
+    "mythic": Rarity.MYTHIC
+}
+
 class Card:
-    def __init__(self, uuid, name, number, mtg_set, price = -1, price_foil = -1, foil = False):
+    def __init__(self, uuid, name, number, mtg_set, rarity=Rarity.COMMON, price = -1, price_foil = -1, foil = False):
         self.uuid = uuid
         self.name = name
         self.number = number
@@ -22,6 +35,7 @@ class Card:
         self.price = price
         self.price_foil = price_foil
         self.foil = foil
+        self.rarity = rarity
         if uuid in price_cache:
             self.price = price_cache[uuid]['normal']
             self.price_foil = price_cache[uuid]['foil']
@@ -54,8 +68,9 @@ def load_card_cache(mtg_set):
         uuid = card['uuid']
         name = card['name']
         number = card['number']
+        rarity = card['rarity']
         if number.isdecimal():
-            card_cache[mtg_set][int(number)] = Card(uuid, name, int(number), mtg_set)
+            card_cache[mtg_set][int(number)] = Card(uuid, name, int(number), mtg_set, rarity_map[rarity])
         #pass
     
 def get_price(mtg_set, card_number, type = Type.NORMAL):
