@@ -93,7 +93,7 @@ def add_card_info_to_frame(frame, text, price, total, cost):
 
     return frame
 
-def add_message_to_center(frame, message):
+def add_message_to_center(frame, message, offset=0, text_color=(255,255,255)):
     height, width, _ = frame.shape
     textSize, _ = cv2.getTextSize(message, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
     
@@ -101,7 +101,7 @@ def add_message_to_center(frame, message):
     lines = len(wrapped_text)
 
     center_x = int(width/2)
-    center_y = int(height/2)
+    center_y = int(height/2) + offset
 
     for line_counter, line in enumerate(wrapped_text):
         textSize, _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 3, 2)
@@ -110,8 +110,8 @@ def add_message_to_center(frame, message):
         x = center_x - int(textSize[0]/2)
         y = center_y - int(textSize[1]/2) - off_set * (textSize[1] + 5)
 
-        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 3, (0,0,0), 6)
-        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 3, (255,255,255), 2)
+        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 3, (0,0,0), 10)
+        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 3, text_color, 5)
     return frame
 
 rare_shout_outs = {
@@ -121,7 +121,7 @@ rare_shout_outs = {
     3: "!!!tripple rare!!",
 }
 
-def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame, cost, output_file='tmp.mp4', fps=None, collector=False):
+def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame, cost, value_threshold = 10.0, output_file='tmp.mp4', fps=None, collector=False):
     frame_number = 0
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -139,11 +139,16 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
             print("Last frame reached")
             break
         mod_frame = frame
-        if cards_in_frame[frame_number] != None and cards_in_frame[frame_number].rarity in [Rarity.RARE, Rarity.MYTHIC] and not collector:
-            rare_set.add(cards_in_frame[frame_number].name)
+        card = cards_in_frame[frame_number]
+        if card != None:
+            card_price = card.price_foil if card.foil else card.price
+            if card_price >= value_threshold:
+                mod_frame = add_message_to_center(mod_frame, "Oh YEAH!!!!", -100, (0,255,0))
+        if card != None and card.rarity in [Rarity.RARE, Rarity.MYTHIC] and not collector:
+            rare_set.add(card.name)
             mod_frame = add_message_to_center(mod_frame, rare_shout_outs[len(rare_set)])
-        if cards_in_frame[frame_number] != None:
-            mod_frame = add_card_info_to_frame(mod_frame, cards_in_frame[frame_number].name, f"${cards_in_frame[frame_number].price}", total_in_frame[frame_number], cost)
+        if card != None:
+            mod_frame = add_card_info_to_frame(mod_frame, card.name, f"${card.price}", total_in_frame[frame_number], cost)
         else:
             mod_frame = add_card_info_to_frame(mod_frame, "", "", total_in_frame[frame_number], cost)
         if frame_number in text_in_frame:
@@ -171,6 +176,7 @@ def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_a
         audio_clip = audio_clip.with_volume_scaled(0.2)
         start_time = frame / fps
         audio_clips.append(audio_clip.with_start(start_time))
+
     video_clip = video_clip.with_audio(CompositeAudioClip(audio_clips))
     video_file_path_no_ext = os.path.splitext(video_file_path)[0]
     ext = os.path.splitext(video_file_path)[1]

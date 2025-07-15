@@ -3,3 +3,5 @@ libsm6
 libxext6
 tesseract-ocr
 libtesseract-dev
+espeak-ng
+libespeak1
