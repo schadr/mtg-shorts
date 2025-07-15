@@ -2,6 +2,8 @@ import requests
 import bz2
 import json
 from enum import Enum
+import os
+from datetime import datetime
 
 card_info_api_endpoint = 'https://mtgjson.com/api/v5/'
 price_file_name = 'AllPricesToday.json.bz2'
@@ -43,10 +45,30 @@ class Card:
     def __str__(self):
         return "uuid: " + self.uuid + ", name: \"" + self.name + "\", set: " + self.mtg_set + ", number: " + str(self.number) + ", price: " + str(self.price) + ", price foil: " + str(self.price_foil)
 
+TMP_FOLDER = "tmp/"
+
+def download_file(uri, cache_folder=TMP_FOLDER):
+    if not os.path.exists(cache_folder):
+        os.makedirs(cache_folder)
+    file_name = uri.split('/')[-1]
+    file_path = os.path.join(cache_folder, file_name)
+    if os.path.exists(file_path):
+        file_stat = os.stat(file_path)
+        file_mtime = file_stat.st_mtime
+        file_date = datetime.fromtimestamp(file_mtime).date()
+        today = datetime.now().date()
+        if file_date != today:
+            os.remove(file_path)
+    if not os.path.exists(file_path):
+        response = requests.get(uri)
+        with open(file_path, 'wb') as f:
+            f.write(response.content)
+    with open(file_path, 'rb') as f:
+        return f.read()
+
 def load_card_cache(mtg_set):
     if len(price_cache) == 0:
-        price_request = requests.get(card_info_api_endpoint + price_file_name)
-        price_json = json.loads(bz2.decompress(price_request.content).decode('utf-8'))
+        price_json = json.loads(bz2.decompress(download_file(card_info_api_endpoint + price_file_name)).decode('utf-8'))
         price_date = price_json["meta"]["date"]
         for price_entry_key in price_json['data'].keys():
             price_cache[price_entry_key] = {}
@@ -63,15 +85,15 @@ def load_card_cache(mtg_set):
     if mtg_set in card_cache:
         pass
     card_cache[mtg_set] = {}
-    card_info_request = requests.get(card_info_api_endpoint + mtg_set +'.json')
-    for card in card_info_request.json()['data']['cards']:
+    card_info_request = download_file(card_info_api_endpoint + mtg_set +'.json')
+    card_info_request = json.loads(card_info_request.decode('utf-8'))
+    for card in card_info_request['data']['cards']:
         uuid = card['uuid']
         name = card['name']
         number = card['number']
         rarity = card['rarity']
         if number.isdecimal():
             card_cache[mtg_set][int(number)] = Card(uuid, name, int(number), mtg_set, rarity_map[rarity])
-        #pass
     
 def get_price(mtg_set, card_number, type = Type.NORMAL):
     load_card_cache(mtg_set)

@@ -81,10 +81,10 @@ def build_frames():
     for i in range(642, 655):
         frames.append(())
     plans = ("FIN", 294, False) # 655 - 690
-    for i in range(655, 691):
+    for i in range(655, 692):
         frames.append(plans)
     return frames
 
 def test_frame_length():
     frames = build_frames()
-    assert len(frames) == 690, f"Expected 690 frames, got {len(frames)}"
+    assert len(frames) == 691, f"Expected 691 frames, got {len(frames)}"

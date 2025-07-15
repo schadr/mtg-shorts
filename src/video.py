@@ -140,6 +140,7 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
             print("Last frame reached")
             break
         mod_frame = frame
+        print(f"Frame: ${frame_number}")
         if cards_in_frame[frame_number] != None and cards_in_frame[frame_number].rarity in [Rarity.RARE, Rarity.MYTHIC] and not collector:
             rare_set.add(cards_in_frame[frame_number].name)
             mod_frame = add_message_to_center(mod_frame, rare_shout_outs[len(rare_set)])
