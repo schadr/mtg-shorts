@@ -1,8 +1,10 @@
 import cv2
 from google import genai
 import textwrap
+from moviepy import VideoFileClip, AudioFileClip, CompositeAudioClip
 
 from src.pricing import Rarity 
+import os
 
 def load_video(file_uri):
     vid = cv2.VideoCapture(file_uri)
@@ -95,11 +97,8 @@ def add_message_to_center(frame, message):
     height, width, _ = frame.shape
     textSize, _ = cv2.getTextSize(message, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
     
-    
     wrapped_text = textwrap.wrap(message, max(1, int(len(message) / (max(1,textSize[0]) / width))))
     lines = len(wrapped_text)
-    
-    print(lines)
 
     center_x = int(width/2)
     center_y = int(height/2)
@@ -140,7 +139,6 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
             print("Last frame reached")
             break
         mod_frame = frame
-        print(f"Frame: ${frame_number}")
         if cards_in_frame[frame_number] != None and cards_in_frame[frame_number].rarity in [Rarity.RARE, Rarity.MYTHIC] and not collector:
             rare_set.add(cards_in_frame[frame_number].name)
             mod_frame = add_message_to_center(mod_frame, rare_shout_outs[len(rare_set)])
@@ -153,3 +151,24 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
         out.write(mod_frame) 
         frame_number += 1
     return out
+
+def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, sound_effect_file_path="sound-effects/cashier-sound-effect.mp3"):
+    video_clip = VideoFileClip(video_file_path)
+    
+    # find card transition frames
+    card_transition_frames = []
+    previous_card = None
+    for i, card in enumerate(cards_in_frame):
+        if (previous_card == None and card != None) or (card != None and previous_card.uuid != card.uuid):
+            card_transition_frames.append(i)
+            previous_card = card
+
+    audio_clips = []
+    for frame in card_transition_frames:
+        audio_clip = AudioFileClip(sound_effect_file_path)
+        start_time = frame / fps
+        audio_clips.append(audio_clip.with_start(start_time))
+    video_clip = video_clip.with_audio(CompositeAudioClip(audio_clips))
+    video_file_path_no_ext = os.path.splitext(video_file_path)[0]
+    ext = os.path.splitext(video_file_path)[1]
+    video_clip.write_videofile(video_file_path_no_ext + "-audio" + ext)
