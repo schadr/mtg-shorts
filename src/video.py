@@ -152,7 +152,7 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
         frame_number += 1
     return out
 
-def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, sound_effect_file_path="sound-effects/cashier-sound-effect.mp3"):
+def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_audio_file_path=None, sound_effect_file_path="sound-effects/cashier-sound-effect.mp3"):
     video_clip = VideoFileClip(video_file_path)
     
     # find card transition frames
@@ -164,8 +164,11 @@ def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, sound_effe
             previous_card = card
 
     audio_clips = []
+    if original_audio_file_path != None:
+        audio_clips.append(AudioFileClip(original_audio_file_path))
     for frame in card_transition_frames:
         audio_clip = AudioFileClip(sound_effect_file_path)
+        audio_clip = audio_clip.with_volume_scaled(0.2)
         start_time = frame / fps
         audio_clips.append(audio_clip.with_start(start_time))
     video_clip = video_clip.with_audio(CompositeAudioClip(audio_clips))

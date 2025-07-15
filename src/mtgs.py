@@ -8,7 +8,7 @@ import argparse
 
 from src.caption_generation import load_captions_from_file, smooth_captions
 from src.pricing import Card, convert_to_cards, create_totals
-from src.video import add_card_info_to_video, extract_card_info_from_video, load_video
+from src.video import add_card_info_to_video, add_coin_sound_effects, extract_card_info_from_video, load_video
 
 def process_video(file_path, collector=False, use_config=False, cost=0):
     video = load_video(file_path)
@@ -24,7 +24,8 @@ def process_video(file_path, collector=False, use_config=False, cost=0):
         smoothed_captions, text_in_frame = load_captions_from_file(f"{path}/cards-{filename.replace(".","-")}.json")
     cards = convert_to_cards(smoothed_captions)
     totals = create_totals(cards, cost)
-    add_card_info_to_video(video, text_in_frame, cards, totals, cost, f"{path}/captioned-{filename}", 24, collector)
+    add_card_info_to_video(video, text_in_frame, cards, totals, cost, f"{path}/captioned-{filename}", video.get(cv2.CAP_PROP_FPS), collector)
+    add_coin_sound_effects(f"{path}/captioned-{filename}", cards, video.get(cv2.CAP_PROP_FPS), file_path)
 
 def create_fps_video(file_path, collector=False, use_config=False, cost=0):
     video = load_video(file_path)
