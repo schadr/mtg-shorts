@@ -128,7 +128,6 @@ def create_totals(cards, cost):
     for card in cards:
         if last_card is None and card is not None:
             total += card.price_foil if card.foil else card.price
-            totals.append(total)
         totals.append(total)
         last_card = card
     # shifting the array to the left to better line up with the card announcements
