@@ -148,7 +148,8 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
             rare_set.add(card.name)
             mod_frame = add_message_to_center(mod_frame, rare_shout_outs[len(rare_set)])
         if card != None:
-            mod_frame = add_card_info_to_frame(mod_frame, card.name, f"${card.price}", total_in_frame[frame_number], cost)
+            price = card.price_foil if card.foil else card.price
+            mod_frame = add_card_info_to_frame(mod_frame, card.name, f"${price}", total_in_frame[frame_number], cost)
         else:
             mod_frame = add_card_info_to_frame(mod_frame, "", "", total_in_frame[frame_number], cost)
         if frame_number in text_in_frame:
