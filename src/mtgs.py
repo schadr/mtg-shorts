@@ -21,15 +21,15 @@ def process_video(file_path, collector=False, use_config=False, cost=0, rotate=F
         cards_in_frame = extract_card_info_from_video(video)
         smoothed_captions = smooth_captions(cards_in_frame)
     else:
-        data = None
-        smoothed_captions, text_in_frame = load_captions_from_file(f"{path}/cards-{filename.replace('.','-')}.json")
+        smoothed_captions, text_in_frame = load_captions_from_file(os.path.join(path,f"cards-{filename.replace('.','-')}.json"))
     cards = convert_to_cards(smoothed_captions)
     totals = create_totals(cards, cost)
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w") as temp_file:
         temp_file_path = temp_file.name
+        out_file = os.path.join(path,f"edited-{filename}")
         add_card_info_to_video(video, text_in_frame, cards, totals, cost, temp_file_path, rotate, video.get(cv2.CAP_PROP_FPS), collector)
-        add_coin_sound_effects(temp_file_path, cards, video.get(cv2.CAP_PROP_FPS), file_path)
+        add_coin_sound_effects(temp_file_path, cards, video.get(cv2.CAP_PROP_FPS), file_path, out_file)
 
 def create_fps_video(file_path, collector=False, use_config=False, cost=0, rotate=False):
     video = load_video(file_path)

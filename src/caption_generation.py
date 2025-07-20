@@ -44,8 +44,8 @@ def load_captions_from_file(file_path):
         for i in range(current_index, start):
             smoothed_captions.append(())
         for i in range(start, end + 1):
-            smoothed_captions.append((card["mtg_set"], card["card_number"], card["foild"]))
+            smoothed_captions.append((card["mtg_set"], card["card_number"], card["foil"] if "foil" in card else False))
         current_index = end + 1
-    for i in range(current_index, int(data["total_frames"])):
+    for i in range(current_index, int(data["total_frames"])+1):
         smoothed_captions.append(())
     return smoothed_captions, text_in_frame

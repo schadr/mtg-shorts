@@ -140,6 +140,7 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
             break
         mod_frame = frame if rotate==False else cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
         card = cards_in_frame[frame_number]
+        rare_set = set()
         if card != None:
             card_price = card.price_foil if card.foil else card.price
             if card_price >= value_threshold:
@@ -158,7 +159,7 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
         frame_number += 1
     return out
 
-def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_audio_file_path=None, sound_effect_file_path="sound-effects/cashier-sound-effect.mp3", out_file_path=None):
+def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_audio_file_path=None, out_file_path=None, sound_effect_file_path="sound-effects/cashier-sound-effect.mp3"):
     video_clip = VideoFileClip(video_file_path)
     
     # find card transition frames
@@ -171,7 +172,8 @@ def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_a
 
     audio_clips = []
     if original_audio_file_path != None:
-        audio_clips.append(AudioFileClip(original_audio_file_path))
+        print(original_audio_file_path)
+        audio_clips.append(VideoFileClip(original_audio_file_path).audio)
     for frame in card_transition_frames:
         audio_clip = AudioFileClip(sound_effect_file_path)
         audio_clip = audio_clip.with_volume_scaled(0.2)
