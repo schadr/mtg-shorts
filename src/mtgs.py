@@ -3,6 +3,7 @@
 import json
 import os
 import shutil
+import tempfile
 import cv2
 import argparse
 
@@ -24,8 +25,11 @@ def process_video(file_path, collector=False, use_config=False, cost=0):
         smoothed_captions, text_in_frame = load_captions_from_file(f"{path}/cards-{filename.replace(".","-")}.json")
     cards = convert_to_cards(smoothed_captions)
     totals = create_totals(cards, cost)
-    add_card_info_to_video(video, text_in_frame, cards, totals, cost, f"{path}/captioned-{filename}", video.get(cv2.CAP_PROP_FPS), collector)
-    add_coin_sound_effects(f"{path}/captioned-{filename}", cards, video.get(cv2.CAP_PROP_FPS), file_path)
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w") as temp_file:
+        temp_file_path = temp_file.name
+        add_card_info_to_video(video, text_in_frame, cards, totals, cost, temp_file_path, video.get(cv2.CAP_PROP_FPS), collector)
+        add_coin_sound_effects(temp_file_path, cards, video.get(cv2.CAP_PROP_FPS), file_path)
 
 def create_fps_video(file_path, collector=False, use_config=False, cost=0):
     video = load_video(file_path)
