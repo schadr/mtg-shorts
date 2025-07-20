@@ -121,24 +121,24 @@ rare_shout_outs = {
     3: "!!!tripple rare!!",
 }
 
-def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame, cost, value_threshold = 10.0, output_file='tmp.mp4', fps=None, collector=False):
+def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame, cost, output_file='tmp.mp4', rotate=False, fps=None, collector=False, value_threshold = 10.0):
     frame_number = 0
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    dim = (width, height) if rotate==False else (height, width)
     if fps is None:
         fps = video.get(cv2.CAP_PROP_FPS)
 
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
-    out = cv2.VideoWriter(output_file, fourcc, fps, (width, height))
-
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(output_file, fourcc, fps, dim)
+    
     rare_set = set()
 
     while video.isOpened():
         ret, frame = video.read()
         if not ret:
-            print("Last frame reached")
             break
-        mod_frame = frame
+        mod_frame = frame if rotate==False else cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
         card = cards_in_frame[frame_number]
         if card != None:
             card_price = card.price_foil if card.foil else card.price
