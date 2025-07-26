@@ -58,21 +58,21 @@ def add_card_info_to_frame(frame, text, price, total, cost):
     height, width, _ = frame.shape
     
     # card title
-    textSize, _ = cv2.getTextSize(f"{text}", cv2.FONT_HERSHEY_TRIPLEX, 1, 2)
-    cv2.putText(frame, f"{text}", (10, 50),  cv2.FONT_HERSHEY_TRIPLEX, min(1.0, (width-20)/textSize[0]), (0, 0, 0), 10)
-    cv2.putText(frame, f"{text}", (10, 50),  cv2.FONT_HERSHEY_TRIPLEX, min(1.0, (width-20)/textSize[0]), (255, 255, 255), 2)
+    textSize, _ = cv2.getTextSize(f"{text}", cv2.FONT_HERSHEY_TRIPLEX, 2, 2)
+    cv2.putText(frame, f"{text}", (10, int(height * .1)),  cv2.FONT_HERSHEY_TRIPLEX, 2, (0, 0, 0), 10)
+    cv2.putText(frame, f"{text}", (10, int(height * .1)),  cv2.FONT_HERSHEY_TRIPLEX, 2, (255, 255, 255), 2)
     
     # card value
-    textSize, _ = cv2.getTextSize(f"{price}", cv2.FONT_HERSHEY_SIMPLEX, 1.5, 2)
-    cv2.putText(frame, f"{price}", (width-40-textSize[0], 120), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 0), 8)
-    cv2.putText(frame, f"{price}", (width-40-textSize[0], 120), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (57, 255, 20), 2)
+    textSize, _ = cv2.getTextSize(f"{price}", cv2.FONT_HERSHEY_SIMPLEX, 2.5, 2)
+    cv2.putText(frame, f"{price}", (width-40-textSize[0], int(height * .15)), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (0, 0, 0), 8)
+    cv2.putText(frame, f"{price}", (width-40-textSize[0], int(height * .15)), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (57, 255, 20), 2)
     
     # pack value
-    textSize, _ = cv2.getTextSize(f"${total:.2f}/${cost:.2f}", cv2.FONT_HERSHEY_SIMPLEX, 1.5, 2)
+    textSize, _ = cv2.getTextSize(f"${total:.2f}/${cost:.2f}", cv2.FONT_HERSHEY_SIMPLEX, 3.5, 2)
     x = int((width - textSize[0])/2)
     pack_value_color = (0,0,255) if (total/cost) < 1 else (0,255,0)
-    cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (x, height - textSize[1] - 30), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 0), 8)
-    cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (x, height - textSize[1] - 30), cv2.FONT_HERSHEY_SIMPLEX, 1.5, pack_value_color, 2)
+    cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (x, int(height * .92) - textSize[1]), cv2.FONT_HERSHEY_SIMPLEX, 3.5, (0, 0, 0), 8)
+    cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (x, int(height * .92) - textSize[1]), cv2.FONT_HERSHEY_SIMPLEX, 3.5, pack_value_color, 2)
     
     # right side box
     bar_width = 40
@@ -95,7 +95,7 @@ def add_card_info_to_frame(frame, text, price, total, cost):
 
 def add_message_to_center(frame, message, offset=0, text_color=(255,255,255)):
     height, width, _ = frame.shape
-    textSize, _ = cv2.getTextSize(message, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+    textSize, _ = cv2.getTextSize(message, cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
     
     wrapped_text = textwrap.wrap(message, max(1, int(len(message) / (max(1,textSize[0]) / width))))
     lines = len(wrapped_text)
@@ -104,14 +104,14 @@ def add_message_to_center(frame, message, offset=0, text_color=(255,255,255)):
     center_y = int(height/2) + offset
 
     for line_counter, line in enumerate(wrapped_text):
-        textSize, _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 3, 2)
+        textSize, _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
         off_set = int(lines / 2) - line_counter
 
         x = center_x - int(textSize[0]/2)
-        y = center_y - int(textSize[1]/2) - off_set * (textSize[1] + 5)
+        y = center_y - int(textSize[1]/2) - off_set * (textSize[1] + 15)
 
-        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 3, (0,0,0), 10)
-        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 3, text_color, 5)
+        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,0), 10)
+        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, text_color, 5)
     return frame
 
 rare_shout_outs = {
