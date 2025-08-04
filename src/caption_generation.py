@@ -39,14 +39,18 @@ def load_captions_from_file(file_path):
             text_in_frame[i] = text_text
 
     for booster in data["boosters"]:
+        num_cards = 0
         for card in booster:
             start = card["first_frame"]
             end = card["last_frame"]
+            if end == 0 and num_cards + 1 < len(booster):
+                end = booster[num_cards + 1]["first_frame"] - 20
             for i in range(current_index, start):
                 smoothed_captions.append(())
             for i in range(start, end + 1):
                 smoothed_captions.append((card["mtg_set"], card["card_number"], card["foil"] if "foil" in card else False))
             current_index = end + 1
+            num_cards += 1
     for i in range(current_index, int(data["total_frames"])+1):
         smoothed_captions.append(())
     return smoothed_captions, text_in_frame
