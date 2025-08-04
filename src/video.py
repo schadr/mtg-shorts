@@ -133,6 +133,7 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
     out = cv2.VideoWriter(output_file, fourcc, fps, dim)
     
     rare_set = set()
+    print(int(video.get(cv2.CAP_PROP_FRAME_COUNT)))
 
     while video.isOpened():
         ret, frame = video.read()

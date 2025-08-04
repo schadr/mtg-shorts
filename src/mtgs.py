@@ -69,6 +69,10 @@ def main():
     if args.folder:
         for item in os.listdir(args.folder):
             file_name = os.path.join(args.folder, item)
+            if file_name.endswith(".json"):
+                continue
+            if os.path.basename(file_name).startswith("frame-"):
+                continue
             if os.path.isfile(file_name):
                 processor(os.path.join(args.folder, file_name), args.collector, args.use_config, args.cost, args.rotate)
 
