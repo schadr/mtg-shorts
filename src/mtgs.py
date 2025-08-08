@@ -34,7 +34,7 @@ def process_video(file_path, collector=False, use_config=False, cost=0, rotate=F
 def create_fps_video(file_path, collector=False, use_config=False, cost=0, rotate=False):
     video = load_video(file_path)
     num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-    cards_in_frame = [Card("uuid", f"Frame: {i}", i, "set", i, i) for i in range(num_frames)]
+    cards_in_frame = [Card("uuid", f"Frame: {i} / {num_frames}", i, "set", i, i) for i in range(num_frames)]
     filename = os.path.basename(file_path)
     path = os.path.dirname(file_path)
     add_card_info_to_video(video, {}, cards_in_frame, [i for i in range(num_frames)], cost, os.path.join(path,f"frame-{filename}"), rotate, 1)
