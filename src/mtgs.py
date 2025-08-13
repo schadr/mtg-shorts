@@ -9,7 +9,7 @@ import argparse
 
 from src.caption_generation import load_captions_from_file, smooth_captions
 from src.pricing import Card, convert_to_cards, create_totals
-from src.video import add_card_info_to_video, add_coin_sound_effects, extract_card_info_from_video, load_video
+from src.video import add_card_info_to_video, add_coin_sound_effects, add_music, extract_card_info_from_video, load_video
 
 def process_video(file_path, collector=False, use_config=False, cost=0, rotate=False):
     video = load_video(file_path)
@@ -29,7 +29,10 @@ def process_video(file_path, collector=False, use_config=False, cost=0, rotate=F
         temp_file_path = temp_file.name
         out_file = os.path.join(path,f"edited-{filename}")
         add_card_info_to_video(video, text_in_frame, cards, totals, cost, temp_file_path, rotate, video.get(cv2.CAP_PROP_FPS), collector)
-        add_coin_sound_effects(temp_file_path, cards, video.get(cv2.CAP_PROP_FPS), file_path, out_file)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w") as temp_file_music:
+            temp_file_music_path = temp_file_music.name
+            add_coin_sound_effects(temp_file_path, cards, video.get(cv2.CAP_PROP_FPS), file_path, temp_file_music_path)
+            add_music(temp_file_music_path, out_file)
 
 def create_fps_video(file_path, collector=False, use_config=False, cost=0, rotate=False):
     video = load_video(file_path)

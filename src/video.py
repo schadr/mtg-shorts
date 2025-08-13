@@ -5,6 +5,7 @@ from moviepy import VideoFileClip, AudioFileClip, CompositeAudioClip
 
 from src.pricing import Rarity 
 import os
+import random
 
 def load_video(file_uri):
     vid = cv2.VideoCapture(file_uri)
@@ -177,7 +178,7 @@ def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_a
         audio_clips.append(VideoFileClip(original_audio_file_path).audio)
     for frame in card_transition_frames:
         audio_clip = AudioFileClip(sound_effect_file_path)
-        audio_clip = audio_clip.with_volume_scaled(0.2)
+        audio_clip = audio_clip.with_volume_scaled(0.15)
         start_time = frame / fps
         audio_clips.append(audio_clip.with_start(start_time))
 
@@ -186,4 +187,22 @@ def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_a
         video_file_path_no_ext = os.path.splitext(video_file_path)[0]
         ext = os.path.splitext(video_file_path)[1]
         out_file_path = video_file_path_no_ext + "-audio" + ext
+    video_clip.write_videofile(out_file_path)
+
+def add_music(video_file_path, out_file_path, music_path="../music/edm"):
+    video_clip = VideoFileClip(video_file_path)
+    music_files = [f for f in os.listdir(music_path) if os.path.isfile(os.path.join(music_path, f))]
+    if not music_files:
+        raise FileNotFoundError(f"No music files found in {music_path}")
+    audio_clips = [VideoFileClip(video_file_path).audio.with_volume_scaled(0.8)]
+    audio_duration = 0
+    while audio_duration < video_clip.duration:
+        selected_music = os.path.join(music_path, random.choice(music_files))
+        audio_clip = AudioFileClip(selected_music).with_start(audio_duration - min(10, audio_duration)) 
+        audio_duration += audio_clip.duration - min(10, audio_duration)
+        if audio_duration > video_clip.duration:
+            audio_clip = audio_clip.with_duration(video_clip.duration - (audio_duration - audio_clip.duration))
+        audio_clips.append(audio_clip)
+    audio_clips.append(AudioFileClip(selected_music).with_volume_scaled(0.2).with_duration(video_clip.duration))
+    video_clip = video_clip.with_audio(CompositeAudioClip(audio_clips))
     video_clip.write_videofile(out_file_path)
