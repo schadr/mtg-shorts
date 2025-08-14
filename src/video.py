@@ -60,13 +60,13 @@ def add_card_info_to_frame(frame, text, price, total, cost):
     
     # card title
     textSize, _ = cv2.getTextSize(f"{text}", cv2.FONT_HERSHEY_TRIPLEX, 2, 2)
-    cv2.putText(frame, f"{text}", (10, int(height * .1)),  cv2.FONT_HERSHEY_TRIPLEX, 2, (0, 0, 0), 10)
-    cv2.putText(frame, f"{text}", (10, int(height * .1)),  cv2.FONT_HERSHEY_TRIPLEX, 2, (255, 255, 255), 2)
+    cv2.putText(frame, f"{text}", (20, int(height * .1)),  cv2.FONT_HERSHEY_TRIPLEX, 2, (0, 0, 0), 10)
+    cv2.putText(frame, f"{text}", (20, int(height * .1)),  cv2.FONT_HERSHEY_TRIPLEX, 2, (255, 255, 255), 2)
     
     # card value
     textSize, _ = cv2.getTextSize(f"{price}", cv2.FONT_HERSHEY_SIMPLEX, 2.5, 2)
-    cv2.putText(frame, f"{price}", (width-40-textSize[0], int(height * .15)), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (0, 0, 0), 8)
-    cv2.putText(frame, f"{price}", (width-40-textSize[0], int(height * .15)), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (57, 255, 20), 2)
+    cv2.putText(frame, f"{price}", (width-60-textSize[0], int(height * .15)), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (0, 0, 0), 8)
+    cv2.putText(frame, f"{price}", (width-60-textSize[0], int(height * .15)), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (57, 255, 20), 2)
     
     # pack value
     textSize, _ = cv2.getTextSize(f"${total:.2f}/${cost:.2f}", cv2.FONT_HERSHEY_SIMPLEX, 3.5, 2)
@@ -76,7 +76,7 @@ def add_card_info_to_frame(frame, text, price, total, cost):
     cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (x, int(height * .92) - textSize[1]), cv2.FONT_HERSHEY_SIMPLEX, 3.5, pack_value_color, 2)
     
     # right side box
-    bar_width = 40
+    bar_width = 60
     bar_height = int(height / (3/2))
     bar_x = width - 10
     bar_y = height - bar_height
