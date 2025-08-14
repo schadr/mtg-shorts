@@ -45,6 +45,16 @@ def create_fps_video(file_path, collector=False, use_config=False, cost=0, rotat
     if collector:
         source = "templates/template-collector-booster.json" 
     shutil.copyfile(source, f"{path}/cards-{filename.replace('.','-')}.json")
+    # Update "total_frames" in the JSON file
+    json_path = f"{path}/cards-{filename.replace('.','-')}.json"
+    if os.path.exists(json_path):
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        data["total_frames"] = num_frames
+        data["text"][-1]["first_frame"] = num_frames - 110
+        data["text"][-1]["last_frame"] = num_frames
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
 
 
 def main():
