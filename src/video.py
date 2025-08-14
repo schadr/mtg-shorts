@@ -196,16 +196,12 @@ def add_music(video_file_path, out_file_path, music_path="../music/edm"):
         raise FileNotFoundError(f"No music files found in {music_path}")
     audio_clips = [VideoFileClip(video_file_path).audio.with_volume_scaled(0.8)]
     audio_duration = 0
-    print("\n\n--------------------------\n--------------------------------")
     while audio_duration < video_clip.duration:
         selected_music = os.path.join(music_path, random.choice(music_files))
         audio_clip = AudioFileClip(selected_music).with_start(audio_duration - min(10, audio_duration)).with_volume_scaled(0.5)
-        print(f"{audio_duration} -- {video_clip.duration} -- {audio_clip.duration} -- {audio_duration + audio_clip.duration - min(10, audio_duration)}")
         if audio_duration + audio_clip.duration - min(10, audio_duration) > video_clip.duration:
-            print(video_clip.duration - audio_duration + min(10, audio_duration))
             audio_clip = audio_clip.with_duration(video_clip.duration - audio_duration + min(10, audio_duration))
         audio_duration += audio_clip.duration - min(10, audio_duration)
         audio_clips.append(audio_clip)
-    print("Audio duration: ", audio_duration)
     video_clip = video_clip.with_audio(CompositeAudioClip(audio_clips))
     video_clip.write_videofile(out_file_path)
