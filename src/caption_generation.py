@@ -40,7 +40,7 @@ def load_captions_from_file(file_path):
 
     for booster in data["boosters"]:
         num_cards = 0
-        for card in booster:
+        for card in booster["cards"]:
             start = card["first_frame"]
             end = card["last_frame"]
             if end == 0 and num_cards + 1 < len(booster):
