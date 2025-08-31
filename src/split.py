@@ -30,6 +30,7 @@ def split_video(video_file_path, config_file_path, mobile=None):
         for card in booster["cards"]:
             card["first_frame"] -= start
             card["last_frame"] -= start
+            card["last_frame"] = max(card["last_frame"], 0)
         subconfig = {
             "total_frames": end - start,
             "text": [        
