@@ -7,3 +7,5 @@ pytesseract==0.3.13
 google-genai==1.22.0
 moviepy==2.2.1
 pyttsx3==2.99
+google-api-python-client==2.179.0
+google-auth-oauthlib==1.2.2

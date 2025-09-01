@@ -7,3 +7,6 @@ tmp-audio.mp4
 style.png
 tmp/
 mylist.txt
+token.pickle
+youtube_client_secret.json
+youtube_token.pickle
