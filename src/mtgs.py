@@ -25,11 +25,11 @@ def process_video(file_path, collector=False, use_config=False, cost=0, rotate=F
     cards = convert_to_cards(smoothed_captions)
     totals = create_totals(cards, cost)
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w") as temp_file:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w", dir=".") as temp_file:
         temp_file_path = temp_file.name
         out_file = os.path.join(path,f"edited-{filename}")
         add_card_info_to_video(video, text_in_frame, cards, totals, cost, temp_file_path, rotate, video.get(cv2.CAP_PROP_FPS), collector)
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w") as temp_file_music:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w", dir=".") as temp_file_music:
             temp_file_music_path = temp_file_music.name
             add_coin_sound_effects(temp_file_path, cards, video.get(cv2.CAP_PROP_FPS), file_path, temp_file_music_path)
             add_music(temp_file_music_path, out_file)

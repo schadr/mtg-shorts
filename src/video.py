@@ -187,7 +187,8 @@ def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_a
         video_file_path_no_ext = os.path.splitext(video_file_path)[0]
         ext = os.path.splitext(video_file_path)[1]
         out_file_path = video_file_path_no_ext + "-audio" + ext
-    video_clip.write_videofile(out_file_path)
+    video_clip.with_duration(video_clip.duration).write_videofile(out_file_path)
+    video_clip.close()
 
 def add_music(video_file_path, out_file_path, music_path="../music/edm"):
     video_clip = VideoFileClip(video_file_path)

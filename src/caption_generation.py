@@ -43,7 +43,7 @@ def load_captions_from_file(file_path):
         for card in booster["cards"]:
             start = card["first_frame"]
             end = card["last_frame"]
-            if end == 0 and num_cards + 1 < len(booster):
+            if end == 0 and num_cards + 1 < len(booster["cards"]):
                 end = booster["cards"][num_cards + 1]["first_frame"] - 10
             for i in range(current_index, start):
                 smoothed_captions.append(())
