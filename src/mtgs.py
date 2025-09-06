@@ -2,32 +2,35 @@
 
 import json
 import os
+from pathlib import Path
 import shutil
 import tempfile
 import cv2
 import argparse
 
-from src.caption_generation import load_captions_from_file, smooth_captions
+from src.caption_generation import load_captions_from_file, load_text
 from src.pricing import Card, convert_to_cards, create_totals
-from src.video import add_card_info_to_video, add_coin_sound_effects, add_music, extract_card_info_from_video, load_video
+from src.video import add_card_info, add_coin_sound_effects, add_music, add_text, extract_card_info_from_video, load_video
 
 def process_video(file_path, collector=False, use_config=False, cost=0, rotate=False):
     video = load_video(file_path)
     smooth_captions = []
-    text_in_frame = {}
     filename = os.path.basename(file_path)
     path = os.path.dirname(file_path)
     out_file = os.path.join(path,f"edited-{filename}")
+    text = None
     if not use_config:
         cards_in_frame = extract_card_info_from_video(video)
         smoothed_captions = smooth_captions(cards_in_frame)
     else:
-        smoothed_captions, text_in_frame = load_captions_from_file(os.path.join(path,f"cards-{filename.replace('.','-')}.json"))
+        smoothed_captions, _ = load_captions_from_file(os.path.join(path,f"cards-{filename.replace('.','-')}.json"))
+        text = load_text(os.path.join(path,f"cards-{filename.replace('.','-')}.json"))
     cards = convert_to_cards(smoothed_captions)
     totals = create_totals(cards, cost)
-
-    temp_file_path = add_card_info_to_video(video, text_in_frame, cards, totals, cost, rotate, video.get(cv2.CAP_PROP_FPS), collector)
+    
+    temp_file_path = add_card_info(video, cards, totals, cost, rotate=rotate, fps=video.get(cv2.CAP_PROP_FPS), collector=collector)
     temp_file_path = add_coin_sound_effects(temp_file_path, cards, video.get(cv2.CAP_PROP_FPS), file_path)
+    temp_file_path = add_text(temp_file_path, text)
     add_music(temp_file_path, out_file)
 
 def create_fps_video(file_path, collector=False, use_config=False, cost=0, rotate=False):
@@ -36,7 +39,7 @@ def create_fps_video(file_path, collector=False, use_config=False, cost=0, rotat
     cards_in_frame = [Card("uuid", f"Frame: {i} / {num_frames}", i, "set", i, i) for i in range(num_frames)]
     filename = os.path.basename(file_path)
     path = os.path.dirname(file_path)
-    add_card_info_to_video(video, {}, cards_in_frame, [i for i in range(num_frames)], cost, os.path.join(path,f"frame-{filename}"), rotate, 1)
+    add_card_info(video, {}, cards_in_frame, [i for i in range(num_frames)], cost, os.path.join(path,f"frame-{filename}"), rotate, 1)
     source = "templates/template-play-booster.json"
     if collector:
         source = "templates/template-collector-booster.json" 
@@ -65,6 +68,8 @@ def main():
     parser.add_argument('--cost', type=float, default=6.0, help='Cost of the booster pack')
     parser.add_argument('--rotate', action="store_true", default=False, help="Rotate output video")
     args = parser.parse_args()
+
+    Path("./tmp-video").mkdir(parents=True, exist_ok=True)
 
     processor = None
     if args.fps:

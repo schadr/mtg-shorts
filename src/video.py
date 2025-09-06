@@ -2,7 +2,7 @@ import tempfile
 import cv2
 from google import genai
 import textwrap
-from moviepy import VideoFileClip, AudioFileClip, CompositeAudioClip
+from moviepy import CompositeVideoClip, TextClip, VideoFileClip, AudioFileClip, CompositeAudioClip
 
 from src.pricing import Rarity 
 import os
@@ -123,9 +123,10 @@ rare_shout_outs = {
     3: "!!!tripple rare!!",
 }
 
-def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame, cost, rotate=False, fps=None, collector=False, value_threshold = 10.0):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w", dir="./tmp-video") as temp_file:
-        output_file = temp_file.name
+def add_card_info(video, cards_in_frame, total_in_frame, cost, output_file=None, rotate=False, fps=None, collector=False, value_threshold = 10.0):
+    if output_file is None:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w", dir="./tmp-video") as temp_file:
+            output_file = temp_file.name
     frame_number = 0
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -158,11 +159,37 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
             mod_frame = add_card_info_to_frame(mod_frame, card.name, f"${price}", total_in_frame[frame_number], cost)
         else:
             mod_frame = add_card_info_to_frame(mod_frame, "", "", total_in_frame[frame_number], cost)
-        if frame_number in text_in_frame:
-            mod_frame = add_message_to_center(mod_frame, text_in_frame[frame_number])
         out.write(mod_frame) 
         frame_number += 1
     return output_file
+
+def add_text(video_file_path, texts):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w", dir="./tmp-video") as temp_file:
+        out_file_path = temp_file.name
+    video_clip = VideoFileClip(video_file_path)
+    sorted_text_items = sorted(texts, key=lambda item: item['first_frame'])
+    clips = [video_clip]
+    for item in sorted_text_items:
+        text = item['text']
+        first_frame = item['first_frame']
+        last_frame = item['last_frame']
+        text_clip = TextClip(
+            text=text,
+            font_size=60,
+            color='white',
+            font='arialbd.ttf',
+            stroke_color="black",
+            stroke_width=2,
+            size=(int(video_clip.size[0]*.8), int(video_clip.size[1]*.5)),
+            method='caption',
+            text_align='center'
+            )
+        text_clip = text_clip.with_start(first_frame / video_clip.fps).with_duration((last_frame - first_frame) / video_clip.fps).with_position("center")
+        clips.append(text_clip)
+
+    video_clip = CompositeVideoClip(clips)
+    video_clip.write_videofile(out_file_path)
+    return out_file_path
 
 def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_audio_file_path=None, sound_effect_file_path="sound-effects/cashier-sound-effect.mp3"):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w", dir="./tmp-video") as temp_file_music:
@@ -195,6 +222,7 @@ def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_a
         out_file_path = video_file_path_no_ext + "-audio" + ext
     video_clip.with_duration(video_clip.duration).write_videofile(out_file_path)
     video_clip.close()
+    return out_file_path
 
 def add_music(video_file_path, out_file_path, music_path="../music/edm"):
     video_clip = VideoFileClip(video_file_path)

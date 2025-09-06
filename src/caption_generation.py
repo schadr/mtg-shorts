@@ -24,6 +24,12 @@ def smooth_captions(frame_captions):
         smoothed_captions.append(())
     return smoothed_captions
 
+def load_text(file_path):
+    data = None
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    return data["text"]
+
 def load_captions_from_file(file_path):
     data = None
     with open(file_path, 'r') as file:

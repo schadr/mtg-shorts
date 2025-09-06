@@ -1,6 +1,6 @@
 from src.video import load_video
 from src.video import add_card_info_to_frame
-from src.video import add_card_info_to_video
+from src.video import add_card_info
 from src.pricing import Card
 
 import cv2
@@ -17,6 +17,6 @@ def test_add_card_info_to_video():
         card.price = i
         card.price_foil = i * 2
         info.append(card)
-    mod_video = add_card_info_to_video(video, info)
+    mod_video = add_card_info(video, info)
     mod_video.release()
     assert mod_video != None
