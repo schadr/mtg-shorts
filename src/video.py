@@ -1,3 +1,4 @@
+import tempfile
 import cv2
 from google import genai
 import textwrap
@@ -122,7 +123,9 @@ rare_shout_outs = {
     3: "!!!tripple rare!!",
 }
 
-def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame, cost, output_file='tmp.mp4', rotate=False, fps=None, collector=False, value_threshold = 10.0):
+def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame, cost, rotate=False, fps=None, collector=False, value_threshold = 10.0):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w", dir="./tmp-video") as temp_file:
+        output_file = temp_file.name
     frame_number = 0
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -159,9 +162,12 @@ def add_card_info_to_video(video, text_in_frame, cards_in_frame, total_in_frame,
             mod_frame = add_message_to_center(mod_frame, text_in_frame[frame_number])
         out.write(mod_frame) 
         frame_number += 1
-    return out
+    return output_file
 
-def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_audio_file_path=None, out_file_path=None, sound_effect_file_path="sound-effects/cashier-sound-effect.mp3"):
+def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_audio_file_path=None, sound_effect_file_path="sound-effects/cashier-sound-effect.mp3"):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w", dir="./tmp-video") as temp_file_music:
+        out_file_path = temp_file_music.name
+        
     video_clip = VideoFileClip(video_file_path)
     
     # find card transition frames
