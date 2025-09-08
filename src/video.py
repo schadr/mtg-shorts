@@ -2,7 +2,7 @@ import tempfile
 import cv2
 from google import genai
 import textwrap
-from moviepy import CompositeVideoClip, TextClip, VideoFileClip, AudioFileClip, CompositeAudioClip
+from moviepy import CompositeVideoClip, TextClip, VideoFileClip, AudioFileClip, CompositeAudioClip, vfx, concatenate_videoclips
 
 from src.pricing import Rarity 
 import os
@@ -189,6 +189,54 @@ def add_text(video_file_path, texts):
 
     video_clip = CompositeVideoClip(clips)
     video_clip.write_videofile(out_file_path)
+    return out_file_path
+
+def speed_up_none_opening_scenes(video_file_path, cards_in_frame, texts, speed_factor=5):
+    speed_up_blocks = []
+    current_block = (None, None)
+    last_empty_frame = None
+    for i, card in enumerate(cards_in_frame):
+        if card is None and last_empty_frame is None:
+            last_empty_frame = i
+            current_block = (i, None)
+        elif card is None:
+            last_empty_frame = i
+        elif card is not None and last_empty_frame is not None:
+            if last_empty_frame - current_block[0] > 20:
+                current_block = (current_block[0], last_empty_frame)
+                speed_up_blocks.append(current_block)
+            last_empty_frame = None
+    print(speed_up_blocks)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", mode="w", dir="./tmp-video") as temp_file:
+        out_file_path = temp_file.name
+
+    if len(speed_up_blocks) == 0:
+        return video_file_path
+
+    # adjust text blocks
+    previous_last_frame = 0
+    for text_item in sorted(texts, key=lambda item: item['first_frame']):
+        shift = 0
+        duration = text_item['last_frame'] - text_item['first_frame']
+        for block in speed_up_blocks:
+            if block[0] < text_item['first_frame']:
+                shift += (min(block[1], text_item['last_frame']) - block[0]) * ((speed_factor - 1) / speed_factor)
+        text_item['first_frame'] = max(previous_last_frame, text_item['first_frame'] - shift)     
+        text_item['last_frame'] = text_item['first_frame'] + duration
+        previous_last_frame = text_item['last_frame']
+    
+    clips = []
+    clip = VideoFileClip(video_file_path)
+    frame = 0
+    for block in speed_up_blocks:
+        if block[0] != 0:
+            clips.append(clip.subclipped(frame / clip.fps, block[0] / clip.fps))
+        speed_up_clip = clip.subclipped(block[0] / clip.fps, block[1] / clip.fps).with_effects([vfx.MultiplySpeed(speed_factor)])
+        frame = block[1]
+        clips.append(speed_up_clip)
+    clips.append(clip.subclipped(frame / clip.fps, clip.duration))
+    new_clip = concatenate_videoclips(clips)
+    new_clip.write_videofile(out_file_path)
     return out_file_path
 
 def add_coin_sound_effects(video_file_path, cards_in_frame, fps = 24, original_audio_file_path=None, sound_effect_file_path="sound-effects/cashier-sound-effect.mp3"):

@@ -10,7 +10,7 @@ import argparse
 
 from src.caption_generation import load_captions_from_file, load_text
 from src.pricing import Card, convert_to_cards, create_totals
-from src.video import add_card_info, add_coin_sound_effects, add_music, add_text, extract_card_info_from_video, load_video
+from src.video import add_card_info, add_coin_sound_effects, add_music, add_text, extract_card_info_from_video, load_video, speed_up_none_opening_scenes
 
 def process_video(file_path, collector=False, use_config=False, cost=0, rotate=False):
     video = load_video(file_path)
@@ -30,6 +30,7 @@ def process_video(file_path, collector=False, use_config=False, cost=0, rotate=F
     
     temp_file_path = add_card_info(video, cards, totals, cost, rotate=rotate, fps=video.get(cv2.CAP_PROP_FPS), collector=collector)
     temp_file_path = add_coin_sound_effects(temp_file_path, cards, video.get(cv2.CAP_PROP_FPS), file_path)
+    temp_file_path = speed_up_none_opening_scenes(temp_file_path, cards, text)
     temp_file_path = add_text(temp_file_path, text)
     add_music(temp_file_path, out_file)
 
