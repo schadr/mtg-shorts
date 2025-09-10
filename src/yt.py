@@ -143,7 +143,7 @@ def upload_videos(folder="", set_name="", booster_type="", set_tag="", extra_tex
         \
         \
         {set_tag} #mtg #magicthegathering #unboxing #tcg #tradingcards"
-        title = f"{set_tag} {booster_type} {pack_number} / {pack_total} of box {box_number}"
+        title = f"{set_tag} {booster_type} booster {pack_number} / {pack_total} of box {box_number}"
 
         dt = datetime.strptime(last_video_time, "%Y-%m-%dT%H:%M:%SZ")
         if dt.strftime("%H:%M:%SZ") == "19:00:00Z":

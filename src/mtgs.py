@@ -40,7 +40,7 @@ def create_fps_video(file_path, collector=False, use_config=False, cost=0, rotat
     cards_in_frame = [Card("uuid", f"Frame: {i} / {num_frames}", i, "set", i, i) for i in range(num_frames)]
     filename = os.path.basename(file_path)
     path = os.path.dirname(file_path)
-    add_card_info(video, {}, cards_in_frame, [i for i in range(num_frames)], cost, os.path.join(path,f"frame-{filename}"), rotate, 1)
+    add_card_info(video, cards_in_frame, [i for i in range(num_frames)], cost, output_file=os.path.join(path,f"frame-{filename}"), rotate=rotate, fps=1)
     source = "templates/template-play-booster.json"
     if collector:
         source = "templates/template-collector-booster.json" 
