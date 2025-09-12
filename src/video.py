@@ -77,7 +77,7 @@ def add_card_info_to_frame(frame, text, price, total, cost):
     cv2.putText(frame, f"${total:.2f}/${cost:.2f}", (x, int(height * .92) - textSize[1]), cv2.FONT_HERSHEY_SIMPLEX, 3.5, pack_value_color, 2)
     
     # right side box
-    bar_width = 60
+    bar_width = 80
     bar_height = int(height / (3/2))
     bar_x = width - 10
     bar_y = height - bar_height
