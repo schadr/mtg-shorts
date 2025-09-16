@@ -7,7 +7,7 @@ param(
 Push-Location $Folder
 
 try {
-    Get-Childitem *.mov | foreach-object -Parallel { ffmpeg -i $_.Name -qscale 0 $_.Name.Replace('.MOV','.mp4').Replace('.mov','.mp4') } -ThrottleLimit 3
+    Get-Childitem *.mov | foreach-object -Parallel { ffmpeg -i $_.Name -vf "transpose=1" -qscale 0 $_.Name.Replace('.MOV','.mp4').Replace('.mov','.mp4') } -ThrottleLimit 3
 }
 finally {
     Pop-Location
